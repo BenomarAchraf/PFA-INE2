@@ -20,6 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/series")
+
 public class SerieController {
 
     private final SerieService serieService;
@@ -27,6 +28,7 @@ public class SerieController {
     public SerieController(SerieService serieService) {
         this.serieService = serieService;
     }
+    
 
     @GetMapping("/{id}")
     public ResponseEntity<Serie> getSerieById(@PathVariable String id) {
