@@ -1,11 +1,15 @@
 package com.MicroMovies.userservice.model;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.management.relation.Role;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,8 +23,18 @@ public class User {
 	private String username;
 	private String password;
 	private String email;
+	private List<String> preferences;
 	@CreatedDate
     private Date createdAt;
-	private Boolean isAdmin;
+	private List<String> roles;
+
+    // ...
+
+    public List<SimpleGrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role))
+                .collect(Collectors.toList());
+    }
+	
 
 }

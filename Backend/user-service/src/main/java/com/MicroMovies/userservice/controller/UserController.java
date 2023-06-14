@@ -14,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,11 +24,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.MicroMovies.userservice.config.IsAdmin;
 import com.MicroMovies.userservice.model.AuthRequest;
 import com.MicroMovies.userservice.model.User;
 import com.MicroMovies.userservice.repository.UserRepository;
 import com.MicroMovies.userservice.service.JwtService;
 import com.MicroMovies.userservice.service.MyService;
+
+import jakarta.annotation.security.RolesAllowed;
 
 
 
@@ -83,7 +88,7 @@ public class UserController {
 		
 	}
 	
-	@PreAuthorize("isAdmin('true')")
+	
 	@GetMapping("/users2")
 	public ResponseEntity<List<User>> getAllUsers1(@RequestBody AuthRequest authRequest){
 		return ResponseEntity.ok(this.userRepository.findAll());
@@ -91,23 +96,12 @@ public class UserController {
 	}
 	
 	
-	@GetMapping("/users3")
-	public ResponseEntity<List<User>> getAllUsers2(@RequestParam String id ){
-		User user=userRepository.findById(id).get();
-		
-		if(user.getIsAdmin()) {
-			
-			return ResponseEntity.ok(this.userRepository.findAll());
-		}
-		else {
-			throw new RuntimeException("invalid access");
-		}
-		
-		
-		
-	}
 	
-	@PostMapping("/users")
+		
+		
+		
+	
+	@PostMapping("/register")
 	
 	public ResponseEntity<User> createUser(@RequestBody User user){
 		try {
@@ -127,7 +121,9 @@ public class UserController {
 	
 	@PostMapping("/login")
 	public String authentificateAndGetToken(@RequestBody AuthRequest authRequest) {
-		Authentication authenticate= authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+		 List<GrantedAuthority> authorities=new ArrayList<>();
+		 authorities.add(new SimpleGrantedAuthority(userRepository.findByUsername(authRequest.getUsername()).get().getRoles().get(0)));
+		Authentication authenticate= authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername() ,authRequest.getPassword(),authorities));
 		if(authenticate.isAuthenticated()) {
 			return jwtService.generateToken(authRequest.getUsername());
 		}
@@ -149,5 +145,17 @@ public class UserController {
 		return ResponseEntity.status(200).body("Token is valid");
 	}
 	
+	@GetMapping("/validate1")
+	public ResponseEntity<String> ValidateToken1(@RequestParam String token){
+		try {
+			jwtService.validateToken(token);
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(500).body("Token is invalid");
+		}
+		
+		return ResponseEntity.status(200).body("Token is valid");
+	}
+
 
 }

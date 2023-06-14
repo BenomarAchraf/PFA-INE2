@@ -1,8 +1,10 @@
 package com.MicroMovies.userservice.config;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.MicroMovies.userservice.model.User;
@@ -11,18 +13,22 @@ public class CustomerUserDetails implements UserDetails{
 	
 	private String username;
 	private String password;
+	private List<String> roles;
+	private List<SimpleGrantedAuthority> Authorities;
 	
 	
 
 	public CustomerUserDetails(User user) {
 		this.username = user.getUsername();
 		this.password = user.getPassword();
+		this.roles=user.getRoles();
+		this.Authorities=user.getAuthorities();
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
-		return null;
+		return Authorities;
 	}
 
 	@Override

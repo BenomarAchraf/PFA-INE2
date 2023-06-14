@@ -6,18 +6,22 @@ import com.abdo.moviesms.Repositories.CommentRepository;
 import com.abdo.moviesms.Services.FilmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/films")
+@RequestMapping("/films")
 public class FilmController {
     @Autowired
     private FilmService filmService;
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
     @GetMapping("")
     public List<Film> getAllFilms() {
@@ -74,6 +78,12 @@ public class FilmController {
         }
 
 
+    }
+    
+    @PostMapping("/Filmnotifications")
+    public ResponseEntity<String> addNotif(@RequestParam String notif){
+    	kafkaTemplate.send("Notification",notif );
+    	return new ResponseEntity<String>("Your message had been sent",HttpStatus.OK);
     }
 
 }

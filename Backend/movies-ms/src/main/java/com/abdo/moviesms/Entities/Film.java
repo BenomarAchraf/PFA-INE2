@@ -10,8 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Document
-
+@Document("movies")
 public class Film {
     @Id
     private String id;

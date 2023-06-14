@@ -8,10 +8,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.annotation.processing.Generated;
 import java.util.List;
-@Document
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Document("series")
 public class Serie {
     @Id
     private String id;
